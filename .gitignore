@@ -102,3 +102,7 @@ ENV/
 
 # pycharm env
 .idea/
+
+# mode dir
+cnn_model/
+cnn_sum_model/
