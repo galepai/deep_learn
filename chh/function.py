@@ -14,11 +14,11 @@ def read_images(dir_path, extension='.jpg', height=0, width=0):
             filename = dir_path + '/' + filename
             img = cv2.imread(filename)
             if height != 0 or width != 0:
-                img = cv2.resize(img, (height, width))
+                img = cv2.resize(img, (width, height))
 
             images.append(img)
     images = np.array(images)
-
+    print('read %d images.' % images.shape[0])
     return images
 
 # method
