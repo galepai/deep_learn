@@ -105,3 +105,8 @@ ENV/
 
 # images
 images/
+
+# mode dir
+cnn_model/
+cnn_sum_model/
+
