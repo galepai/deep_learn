@@ -110,3 +110,8 @@ images/
 cnn_model/
 cnn_sum_model/
 
+# tensorboard log
+logs/
+
+# save model file
+*.h5
