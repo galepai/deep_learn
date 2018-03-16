@@ -12,7 +12,7 @@ first_train = False
 is_continue_train = False
 is_test = True
 
-num_epochs = 10
+num_epochs = 1
 batch_size = 100
 
 if is_continue_train:
@@ -82,9 +82,14 @@ else:
     model = load_model('my_model.h5')
 
 if is_test:
+    # _img = read_images('e:\Python_Project\images\mix_pic')
 
-    _img = read_images('e:\Python_Project\images\mix_pic')
-    # _img = np.expand_dims(img, axis=0)
+    # img_path = 'e:\Python_Project\images\own pic\892.jpg'
+    img_path = 'own.jpg'
+    image = cv2.imread(img_path)
+    face, x, y, w, h = detect_face(image)
+
+    _img = np.expand_dims(face, axis=0)
     result = model.predict(_img)
     # score = model.evaluate(test, Y_test, verbose=0)
     _result = np.argmax(result, axis=1)
@@ -92,15 +97,14 @@ if is_test:
         if _result[i]:
             print('own pic')
             font = cv2.FONT_HERSHEY_SIMPLEX
-            img = cv2.resize(_img[i], dsize=(128, 128))
-            cv2.putText(img, 'chenhui', (0, 30), font, 1, (0, 255, 0), 1)
-            cv2.imshow('image', img)
+            cv2.putText(image, 'chenhui', (x, y), font, 1, (0, 255, 0), 1)
+            cv2.rectangle(image, (x, y), (x + w, y + w), (0, 255, 0), 2)
+            cv2.imshow('image', image)
             cv2.waitKey()
         else:
             print('other pic')
             font = cv2.FONT_HERSHEY_SIMPLEX
-            img = cv2.resize(_img[i], dsize=(128, 128))
-            cv2.putText(img, 'other', (0, 30), font, 1, (0, 255, 0), 1)
-            cv2.imshow('image', img)
+            cv2.putText(image, 'other', (0, 30), font, 1, (0, 255, 0), 1)
+            cv2.imshow('image', image)
             cv2.waitKey()
 
