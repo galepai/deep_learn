@@ -45,8 +45,8 @@ def detect_face(cv_image):
     print('find %d faces!' % len(faces))
 
     for (x, y, w, h) in faces:
-        cv2.rectangle(cv_image, (x, y), (x+w, y+w), (0, 255, 0), 2)
-        face = cv_image[y:y+w, x:x+w]
+        # cv2.rectangle(cv_image, (x, y), (x+w, y+h), (0, 255, 0), 2)
+        face = cv_image[y:y+h, x:x+w]
         face = cv2.resize(face, (64, 64))
     # cv2.imshow("Find Faces!", face)
     # cv2.waitKey(0)

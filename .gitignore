@@ -115,3 +115,6 @@ logs/
 
 # save model file
 *.h5
+
+# other
+clean-dataset/

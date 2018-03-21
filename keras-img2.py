@@ -3,31 +3,41 @@ import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Convolution2D, MaxPooling2D
-from keras.utils import np_utils
 from keras.models import load_model
 import keras.callbacks as callbacks
-from sklearn.model_selection import train_test_split
+from keras.preprocessing.image import ImageDataGenerator
 
 first_train = False
-is_continue_train = False
+is_continue_train = True
 is_test = not is_continue_train
 
-num_epochs = 5
+train_dir = 'e:\Python_Project\images\image'
+
+num_epochs = 1
 batch_size = 100
 
-if is_continue_train:
-    own_images = read_images('e:\Python_Project\images\my_faces')
-    other_images = read_images('e:\Python_Project\images\other_faces')
-    images = np.append(own_images, other_images)
-    _images = images.reshape((-1, 64, 64, 3))
+data_gen = ImageDataGenerator(rescale=1. / 255, validation_split=0.1)
 
-    own_labels = np_utils.to_categorical(np.random.randint(1, 2, own_images.shape[0]), 2)
-    other_labels = np_utils.to_categorical(np.random.randint(0, 1, other_images.shape[0]), 2)
-    labels = np.append(own_labels, other_labels)
-    _labels = labels.reshape(-1, 2)
-    train_x, test_x, train_y, test_y = train_test_split(_images, _labels, test_size=0.1, random_state=np.random.randint(0, 100))
-    train_x = train_x / 255.0
-    test_x = test_x / 255.0
+# classes: 可选参数,为子文件夹的列表,如['dogs','cats']默认为None.
+# 若未提供,则该类别列表将从directory下的子文件夹名称/结构自动推断。
+# 每一个子文件夹都会被认为是一个新的类。(类别的顺序将按照字母表顺序映射到标签值)。
+# 通过属性class_indices可获得文件夹名与类的序号的对应字典。
+train_generator = data_gen.flow_from_directory(train_dir,
+                                               target_size=(64, 64),
+                                               batch_size=batch_size,
+                                               class_mode='categorical', subset='training')
+validation_generator = data_gen.flow_from_directory(train_dir,
+                                               target_size=(64, 64),
+                                               batch_size=batch_size,
+                                               class_mode='categorical', subset='validation')
+
+# print(train_generator.class_indices)
+# validation_generator = data_gen.flow_from_directory(validation_dir,
+#                                                     target_size=(64, 64),
+#                                                     batch_size=batch_size,
+#                                                     class_mode='categorical')
+
+if is_continue_train:
 
     if first_train:
         # 建模
@@ -69,17 +79,24 @@ if is_continue_train:
         model.compile(loss='categorical_crossentropy',
                       optimizer='adadelta',
                       metrics=['accuracy'])
-        tensorboard = callbacks.TensorBoard()
-        model.fit(x=train_x, y=train_y, batch_size=batch_size, epochs=num_epochs, verbose=1, validation_data=(test_x, test_y), callbacks=[tensorboard])
-        model.save('my_model.h5')
+        tensor_board = callbacks.TensorBoard()
+        model.fit_generator(generator=train_generator,
+                            epochs=num_epochs,
+                            validation_data=validation_generator,
+                            callbacks=[tensor_board])
+        model.save('my_model_2.h5')
     else:
         print('continue train .............')
         model = load_model('my_model.h5')
-        tensorboard = callbacks.TensorBoard()
-        model.fit(x=train_x, y=train_y, batch_size=batch_size, epochs=num_epochs, verbose=1, validation_data=(test_x, test_y), callbacks=[tensorboard])
-        model.save('my_model.h5')
+        model.summary()
+        tensor_board = callbacks.TensorBoard()
+        model.fit_generator(generator=train_generator,
+                            epochs=num_epochs,
+                            validation_data=validation_generator,
+                            callbacks=[tensor_board])
+        model.save('my_model_2.h5')
 else:
-    model = load_model('my_model.h5')
+    model = load_model('my_model_2.h5')
 
 if is_test:
     # _img = read_images('e:\Python_Project\images\mix_pic')
@@ -107,4 +124,3 @@ if is_test:
             cv2.putText(image, 'other', (0, 30), font, 1, (0, 255, 0), 1)
             cv2.imshow('image', image)
             cv2.waitKey()
-
